@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEXUS - Command Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "tertiary-container": "#200003",
+                    "primary-container": "#0a0a0b",
+                    "surface-container-low": "#1b1b1d",
+                    "on-surface-variant": "#c7c6ca",
+                    "surface-variant": "#353437",
+                    "surface-container-highest": "#353437",
+                    "surface-container-lowest": "#0e0e10",
+                    "outline": "#919094",
+                    "primary": "#c8c6c7",
+                    "surface-container": "#1f1f21",
+                    "secondary": "#c6c6c6",
+                    "background": "#131315",
+                    "outline-variant": "#46464a",
+                    "on-primary": "#313031",
+                    "error": "#ffb4ab",
+                    "surface": "#131315",
+                    "on-surface": "#e4e2e4",
+                    "surface-container-high": "#2a2a2c",
+                    "on-background": "#e4e2e4",
+                    "tertiary": "#ffb3b4",
+                    "error-container": "#93000a",
+                    "hunter-crimson": "#C41E3A",
+                    "liquid-silver": "#E2E2E2"
+                },
+                "fontFamily": {
+                    "data-mono": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                },
+                "fontSize": {
+                    "data-mono": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                    "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "headline-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "headline-sm": ["20px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                    "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                    "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                    "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.15em", "fontWeight": "600" }],
+                },
+                "spacing": {
+                    "margin-mobile": "20px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    body {
+        background-color: #131315;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        color: #e4e2e4;
+    }
+    .glass-panel {
+        background-color: rgba(26, 26, 28, 0.4);
+        backdrop-filter: blur(40px);
+        border: 0.5px solid rgba(226, 226, 226, 0.2);
+        border-radius: 0;
+    }
+    .thin-border { border-color: rgba(226, 226, 226, 0.1); }
+    #tactical-input:focus-within { border-bottom-color: rgba(226, 226, 226, 0.8); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #131315; }
+    ::-webkit-scrollbar-thumb { background: rgba(226, 226, 226, 0.2); }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(226, 226, 226, 0.5); }
+    @keyframes scan {
+        0% { top: 0%; opacity: 0; }
+        10% { opacity: 0.5; }
+        90% { opacity: 0.5; }
+        100% { top: 100%; opacity: 0; }
+    }
+</style>
+</head>
+<body class="min-h-screen flex text-on-surface antialiased overflow-x-hidden">
+
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-20 hover:w-64 transition-all duration-500 z-[60] overflow-hidden border-r border-white/5 bg-surface-container-lowest/90 backdrop-blur-3xl flex-col py-8 group">
+    <div class="px-6 mb-12 shrink-0 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <h1 class="font-headline-sm text-headline-sm text-primary">STRATEGIC OPS</h1>
+        <p class="font-label-caps text-label-caps tracking-[0.15em] text-on-surface-variant opacity-60 mt-2">PREDATOR LEVEL 1</p>
+    </div>
+    <div class="flex-1 flex flex-col gap-2">
+        <a class="flex items-center px-6 py-4 text-primary border-l-2 border-tertiary font-bold bg-white/5 whitespace-nowrap hover:bg-white/5 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined w-8" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Dashboard</span>
+        </a>
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">visibility</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Intelligence</span>
+        </a>
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">target</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Deployment</span>
+        </a>
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">person_search</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Recruitment</span>
+        </a>
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">folder_special</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Archives</span>
+        </a>
+    </div>
+    <div class="px-6 mt-auto flex flex-col gap-4 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button class="bg-liquid-silver text-background font-label-caps text-label-caps tracking-[0.15em] py-3 px-4 w-full text-center hover:scale-[1.02] transition-transform">NEW MISSION</button>
+    </div>
+    <div class="mt-8 flex flex-col gap-2">
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">help_outline</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Support</span>
+        </a>
+        <a class="flex items-center px-6 py-4 text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5 hover:text-primary transition-all duration-300 whitespace-nowrap" href="#">
+            <span class="material-symbols-outlined w-8">logout</span>
+            <span class="ml-4 font-label-caps text-label-caps tracking-[0.15em] opacity-0 group-hover:opacity-100 transition-opacity duration-300">Logout</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="flex-1 md:ml-20 md:pt-0 px-margin-mobile md:px-margin-desktop pb-32 flex flex-col">
+
+    <!-- Hero -->
+    <header class="flex flex-col justify-center items-start mt-8">
+        <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-liquid-silver leading-none tracking-tighter">NEXUS</h1>
+        <p class="font-data-mono text-data-mono text-on-surface-variant mt-4 tracking-widest uppercase">WE DON'T APPLY. WE HUNT.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mt-8">
+
+        <!-- Tactical Entry -->
+        <section class="md:col-span-12 mt-12">
+            <div class="opacity-30 hover:opacity-100 transition-opacity duration-500 w-full">
+                <div class="flex items-center gap-4 mt-6 mb-8">
+                    <span class="font-label-caps text-label-caps text-liquid-silver text-[10px] uppercase">Mode:</span>
+                    <button id="mode-toggle" onclick="toggleMode()" class="font-data-mono text-[11px] text-hunter-crimson border border-hunter-crimson/50 px-3 py-1 hover:bg-hunter-crimson hover:text-background transition-colors uppercase">
+                        SINGLE TARGET
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+                    <div>
+                        <label class="font-label-caps text-label-caps text-liquid-silver block mb-4 tracking-widest uppercase">Tactical Entry</label>
+                        <div class="flex items-center border-b-[0.5px] border-liquid-silver/20 pb-2 transition-colors duration-300" id="tactical-input">
+                            <span class="material-symbols-outlined text-liquid-silver mr-4">search</span>
+                            <input id="target-input" class="bg-transparent border-none outline-none w-full font-body-lg text-body-lg text-liquid-silver placeholder:text-surface-variant focus:ring-0 px-0" placeholder="Designate Target..." type="text"/>
+                            <button id="cv-toggle" class="material-symbols-outlined text-surface-variant hover:text-liquid-silver transition-colors">upload_file</button>
+                        </div>
+                        <textarea id="cv-input" class="hidden w-full bg-transparent border-b border-liquid-silver/10 outline-none font-data-mono text-data-mono text-liquid-silver placeholder:text-surface-variant focus:ring-0 px-0 resize-none mt-4 pb-2" rows="6" placeholder="Paste your CV here then hit Enter on the target field..."></textarea>
+                        <input id="cv-file-input" type="file" accept=".pdf,.docx" class="hidden"/>
+                    </div>
+                    <div>
+                        <label class="font-label-caps text-label-caps text-liquid-silver block mb-4 tracking-widest uppercase">Job Description</label>
+                        <textarea id="jd-input" class="w-full min-h-[140px] bg-surface-container/30 border border-liquid-silver/10 outline-none font-data-mono text-data-mono text-liquid-silver placeholder:text-surface-variant focus:ring-0 focus:border-liquid-silver/30 px-4 py-3 resize-y" rows="6" placeholder="Paste the job description — role, requirements, responsibilities..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel Acquisition (hidden until panel mode engaged) -->
+        <section id="panel-acquisition" class="hidden md:col-span-12 mt-8">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-8 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-hunter-crimson/50 block"></span>
+                Target Acquisition
+                <span id="panel-count" class="font-data-mono text-[10px] text-hunter-crimson ml-auto"></span>
+            </h2>
+            <div id="panel-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </section>
+
+        <!-- Target Lock -->
+        <section id="target-lock-section" class="md:col-span-5 lg:col-span-4 mt-12">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-8 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-liquid-silver/20 block"></span>
+                Target Lock
+            </h2>
+            <div class="glass-panel p-8 relative overflow-hidden group transition-all duration-300 hover:border-liquid-silver/50 hover:bg-surface-container-low">
+                <div class="absolute top-0 right-0 p-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-hunter-crimson animate-pulse"></span>
+                    <span id="target-status" class="font-data-mono text-[10px] text-hunter-crimson uppercase tracking-widest">Falcon Eye Active</span>
+                </div>
+                <div class="w-full aspect-square mb-6 border-[0.5px] border-liquid-silver/20 bg-surface-container relative flex items-center justify-center p-8">
+                    <img id="target-lock-img" alt="Target Profile" class="w-full h-full object-contain hidden"/>
+                    <div id="target-lock-placeholder" class="flex flex-col items-center justify-center text-surface-variant">
+                        <span class="material-symbols-outlined text-5xl opacity-30">person_search</span>
+                        <span class="font-data-mono text-[10px] mt-4 uppercase tracking-widest opacity-50">Awaiting Target</span>
+                    </div>
+                    <div class="absolute inset-0 border-b-[0.5px] border-hunter-crimson opacity-0 group-hover:opacity-50 transition-opacity duration-1000 animate-[scan_3s_ease-in-out_infinite]"></div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end border-b-[0.5px] border-liquid-silver/20 pb-2">
+                        <span class="font-label-caps text-label-caps text-surface-variant uppercase">Identity</span>
+                        <span id="target-identity" class="font-data-mono text-data-mono text-liquid-silver">AWAITING TARGET</span>
+                    </div>
+                    <div class="flex justify-between items-end border-b-[0.5px] border-liquid-silver/20 pb-2">
+                        <span class="font-label-caps text-label-caps text-surface-variant uppercase">Role</span>
+                        <span id="target-role" class="font-data-mono text-data-mono text-liquid-silver">--</span>
+                    </div>
+                    <div class="flex justify-between items-end border-b-[0.5px] border-liquid-silver/20 pb-2">
+                        <span class="font-label-caps text-label-caps text-surface-variant uppercase">Weakness</span>
+                        <span id="target-threat" class="font-data-mono text-[11px] text-hunter-crimson text-right max-w-[60%]">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Signal Translation -->
+        <section class="md:col-span-7 lg:col-span-8 mt-12">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-8 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-liquid-silver/20 block"></span>
+                Signal Translation
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-px bg-liquid-silver/20 thin-border border-[0.5px]">
+                <div class="bg-background/90 p-8 min-h-[300px] flex flex-col">
+                    <span class="font-data-mono text-[10px] text-surface-variant uppercase mb-6 block">RAW INTERCEPT</span>
+                    <p id="raw-intercept" class="font-body-md text-body-md text-on-surface-variant/50 line-through decoration-hunter-crimson/50">Awaiting target designation...</p>
+                </div>
+                <div class="bg-[#1A1A1C] p-8 min-h-[300px] flex flex-col relative overflow-hidden">
+                    <span class="font-data-mono text-[10px] text-liquid-silver uppercase mb-6 block">LETHAL STRIKE REWRITE</span>
+                    <p id="lethal-rewrite" class="font-headline-sm text-headline-sm text-liquid-silver leading-snug">Standing by...</p>
+                    <div class="mt-auto pt-8 flex items-center justify-between">
+                        <span id="approach-label" class="font-data-mono text-[11px] text-hunter-crimson max-w-[70%]">--</span>
+                        <button class="font-label-caps text-label-caps text-background bg-liquid-silver px-4 py-2 hover:bg-white transition-colors uppercase">Deploy</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gap Analysis (hidden until CV provided) -->
+        <section id="gap-results" class="hidden md:col-span-12 mt-8">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-8 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-hunter-crimson/50 block"></span>
+                Gap Analysis
+            </h2>
+            <div class="glass-panel p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <div>
+                        <p class="font-data-mono text-[10px] text-surface-variant mb-2 uppercase">Match Score</p>
+                        <p id="gap-score" class="font-headline-lg text-headline-lg text-hunter-crimson leading-none">--</p>
+                    </div>
+                    <div>
+                        <p class="font-data-mono text-[10px] text-surface-variant mb-3 uppercase">Critical Gaps</p>
+                        <ul id="gap-list" class="font-data-mono text-[12px] text-on-surface-variant space-y-2"></ul>
+                    </div>
+                    <div>
+                        <p class="font-data-mono text-[10px] text-surface-variant mb-3 uppercase">48hr Fix</p>
+                        <p id="gap-fix" class="font-data-mono text-[12px] text-liquid-silver"></p>
+                    </div>
+                </div>
+                <div class="border-t border-liquid-silver/10 pt-6">
+                    <p class="font-data-mono text-[10px] text-surface-variant mb-2 uppercase">Verdict</p>
+                    <p id="gap-verdict" class="font-headline-sm text-headline-sm text-liquid-silver"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tailored Materials (hidden until docs generated) -->
+        <section id="docs-results" class="hidden md:col-span-12 mt-8">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-8 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-liquid-silver/50 block"></span>
+                Tailored Materials
+            </h2>
+            <div class="glass-panel p-8 space-y-8">
+                <div id="doc-downloads" class="hidden flex flex-wrap gap-4 pb-4 border-b border-liquid-silver/10">
+                    <a id="download-resume" href="#" class="font-label-caps text-label-caps text-background bg-hunter-crimson px-5 py-3 hover:bg-red-700 transition-colors uppercase tracking-widest">Download Tailored Resume (Word)</a>
+                    <a id="download-cover" href="#" class="font-label-caps text-label-caps text-background bg-liquid-silver px-5 py-3 hover:bg-white transition-colors uppercase tracking-widest">Download Cover Letter (Word)</a>
+                </div>
+                <div>
+                    <p class="font-data-mono text-[10px] text-surface-variant mb-2 uppercase">Subject Line</p>
+                    <p id="doc-subject" class="font-data-mono text-[13px] text-hunter-crimson"></p>
+                </div>
+                <div>
+                    <p class="font-data-mono text-[10px] text-surface-variant mb-3 uppercase">Rewritten Summary</p>
+                    <p id="doc-summary" class="font-body-md text-body-md text-liquid-silver leading-relaxed"></p>
+                </div>
+                <div>
+                    <p class="font-data-mono text-[10px] text-surface-variant mb-3 uppercase">Key Bullets</p>
+                    <ul id="doc-bullets" class="font-data-mono text-[12px] text-on-surface-variant space-y-2"></ul>
+                </div>
+                <div class="border-t border-liquid-silver/10 pt-6">
+                    <p class="font-data-mono text-[10px] text-surface-variant mb-4 uppercase">Cover Letter</p>
+                    <p id="doc-cover-letter" class="font-body-md text-body-md text-liquid-silver leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Escalation Protocol -->
+        <section id="escalation-section" class="hidden md:col-span-12 mt-12">
+            <h2 class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase mb-16 flex items-center gap-4">
+                <span class="w-8 h-[0.5px] bg-liquid-silver/20 block"></span>
+                Escalation Protocol
+            </h2>
+            <div class="relative w-full max-w-5xl mx-auto px-4">
+                <div class="absolute top-1/2 left-4 right-4 h-[0.5px] bg-liquid-silver/20 -translate-y-1/2 z-0"></div>
+                <div id="escalation-timeline" class="flex justify-between items-center relative z-10">
+                    <button type="button" data-level="1" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-liquid-silver rotate-45"></div>
+                        <span class="font-data-mono text-[10px] text-liquid-silver mt-4 absolute top-full uppercase">LVL_1</span>
+                    </button>
+                    <button type="button" data-level="2" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-background border-[0.5px] border-liquid-silver rotate-45 group-hover:bg-liquid-silver transition-colors duration-300"></div>
+                        <span class="font-data-mono text-[10px] text-surface-variant mt-4 absolute top-full uppercase group-hover:text-liquid-silver transition-colors">LVL_2</span>
+                    </button>
+                    <button type="button" data-level="3" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-background border-[0.5px] border-liquid-silver rotate-45 group-hover:bg-liquid-silver transition-colors duration-300"></div>
+                        <span class="font-data-mono text-[10px] text-surface-variant mt-4 absolute top-full uppercase group-hover:text-liquid-silver transition-colors">LVL_3</span>
+                    </button>
+                    <button type="button" data-level="4" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-background border-[0.5px] border-liquid-silver/20 rotate-45 group-hover:border-liquid-silver transition-colors duration-300"></div>
+                        <span class="font-data-mono text-[10px] text-surface-variant/30 mt-4 absolute top-full uppercase group-hover:text-surface-variant transition-colors">LVL_4</span>
+                    </button>
+                    <button type="button" data-level="5" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-background border-[0.5px] border-liquid-silver/20 rotate-45 group-hover:border-liquid-silver transition-colors duration-300"></div>
+                        <span class="font-data-mono text-[10px] text-surface-variant/30 mt-4 absolute top-full uppercase group-hover:text-surface-variant transition-colors">LVL_5</span>
+                    </button>
+                    <button type="button" data-level="6" class="escalation-node flex flex-col items-center group cursor-pointer bg-transparent border-none p-0">
+                        <div class="node-diamond w-3 h-3 bg-background border-[0.5px] border-hunter-crimson rotate-45 group-hover:bg-hunter-crimson transition-colors duration-300"></div>
+                        <span class="font-data-mono text-[10px] text-hunter-crimson mt-4 absolute top-full uppercase opacity-50 group-hover:opacity-100 transition-opacity">LVL_6</span>
+                    </button>
+                </div>
+            </div>
+            <div id="escalation-detail" class="glass-panel p-8 mt-20 max-w-5xl mx-auto hidden">
+                <p id="escalation-level-label" class="font-data-mono text-[10px] text-hunter-crimson mb-4 uppercase tracking-widest">Level 1</p>
+                <p id="escalation-level-text" class="font-body-md text-body-md text-liquid-silver leading-relaxed"></p>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="pb-8 border-t-[0.5px] border-liquid-silver/10 flex justify-center mt-24">
+        <p class="font-data-mono text-[10px] text-surface-variant tracking-[0.3em] uppercase text-center w-full max-w-lg">
+            NEXUS IS CURRENTLY AVAILABLE FOR DEPLOYMENT. SO IS ITS CREATOR.
+        </p>
+    </footer>
+
+</main>
+
+<script>
+    // CV toggle - opens file picker
+    document.getElementById('cv-toggle').addEventListener('click', function() {
+        document.getElementById('cv-file-input').click();
+    });
+
+    // When file is selected, show confirmation
+    document.getElementById('cv-file-input').addEventListener('change', function() {
+        if (this.files[0]) {
+            document.getElementById('cv-toggle').textContent = 'task_alt';
+            const preview = document.getElementById('cv-input');
+            preview.classList.remove('hidden');
+            preview.value = 'FILE LOADED: ' + this.files[0].name;
+            preview.disabled = true;
+        }
+    });
+
+    // Enter to engage
+    document.getElementById('target-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') engage();
+    });
+
+    let panelMode = false;
+    let escalationData = {};
+    let panelProfiles = {};
+    let panelData = [];
+    let selectedPanelTarget = null;
+
+    function judgeCardImage(profile, name) {
+        if (profile.image_url) return profile.image_url;
+        const seed = encodeURIComponent(name.replace(/ /g, ''));
+        return `https://api.dicebear.com/7.x/notionists/png?seed=${seed}&backgroundColor=1a365d`;
+    }
+
+    function renderPanelGrid(panel) {
+        const grid = document.getElementById('panel-grid');
+        const section = document.getElementById('panel-acquisition');
+        grid.innerHTML = '';
+        panelProfiles = {};
+        panel.forEach(item => { panelProfiles[item.target] = item.profile; });
+
+        panel.forEach(item => {
+            const p = item.profile;
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.className = 'glass-panel p-4 text-left hover:border-hunter-crimson/60 transition-all duration-300 group';
+            if (selectedPanelTarget === item.target) {
+                card.classList.add('border-hunter-crimson/80', 'bg-white/5');
+            }
+            card.innerHTML = `
+                <div class="aspect-square mb-3 border border-liquid-silver/10 bg-surface-container flex items-center justify-center overflow-hidden p-3">
+                    <img src="${judgeCardImage(p, item.target)}" alt="${item.target}" class="w-full h-full object-contain p-2" onerror="this.src='https://api.dicebear.com/7.x/initials/png?seed=${encodeURIComponent(item.target)}&backgroundColor=1a365d'"/>
+                </div>
+                <p class="font-data-mono text-[11px] text-liquid-silver uppercase leading-tight">${item.target}</p>
+                <p class="font-data-mono text-[9px] text-surface-variant mt-1 line-clamp-2">${p.role || p.title || 'Judge'}</p>
+            `;
+            card.addEventListener('click', () => engageJudge(item.target));
+            grid.appendChild(card);
+        });
+
+        section.classList.remove('hidden');
+        document.getElementById('panel-count').textContent = `${panel.length} TARGETS LOCKED`;
+    }
+
+    function renderEngageResult(data, target) {
+        const p = data.profile;
+
+        document.getElementById('target-identity').textContent = (p.name || target).toUpperCase();
+        document.getElementById('target-role').textContent = p.role || '--';
+        document.getElementById('target-threat').textContent = (p.weakness || '--').substring(0, 60);
+        document.getElementById('target-status').textContent = 'TARGET LOCKED';
+        setTargetImage(p.image_url);
+        document.getElementById('raw-intercept').textContent = p.focus || '--';
+        document.getElementById('lethal-rewrite').textContent = p.last_signal || '--';
+        document.getElementById('approach-label').textContent = p.approach || '--';
+
+        if (data.gaps) {
+            document.getElementById('gap-results').classList.remove('hidden');
+            document.getElementById('gap-score').textContent = data.gaps.match_score + '%';
+            document.getElementById('gap-fix').textContent = data.gaps.quick_fix || '--';
+            document.getElementById('gap-verdict').textContent = data.gaps.verdict || '--';
+            const list = document.getElementById('gap-list');
+            list.innerHTML = '';
+            (data.gaps.critical_gaps || []).forEach(g => {
+                const li = document.createElement('li');
+                li.textContent = '— ' + g;
+                list.appendChild(li);
+            });
+        }
+
+        if (data.docs) renderDocs(data.docs, data.files);
+        if (data.escalation) renderEscalation(data.escalation);
+    }
+
+    async function buildEngageRequest(target) {
+        const cvFile = document.getElementById('cv-file-input').files[0];
+        const cvText = document.getElementById('cv-input').value;
+        const jd = document.getElementById('jd-input').value;
+
+        if (cvFile) {
+            const form = new FormData();
+            form.append('target', target);
+            form.append('jd', jd);
+            form.append('cv_file', cvFile);
+            return fetch('/engage', { method: 'POST', body: form });
+        }
+        return fetch('/engage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target, jd, cv: cvText || 'CV_PENDING' })
+        });
+    }
+
+    async function engagePanel() {
+        document.getElementById('panel-acquisition').classList.remove('hidden');
+        document.getElementById('panel-grid').innerHTML = '<p class="font-data-mono text-data-mono text-hunter-crimson col-span-full animate-pulse">ACQUIRING ALL TARGETS IN PARALLEL...</p>';
+        document.getElementById('target-status').textContent = 'PANEL HUNT ACTIVE';
+        document.getElementById('target-identity').textContent = 'MULTI-TARGET SCAN';
+
+        const response = await fetch('/engage-panel', { method: 'POST', body: new FormData() });
+        const data = await response.json();
+        panelData = data.panel || [];
+        renderPanelGrid(panelData);
+    }
+
+    async function engageJudge(target) {
+        selectedPanelTarget = target;
+        if (panelData.length) renderPanelGrid(panelData);
+        document.getElementById('target-input').value = target;
+        document.getElementById('target-identity').textContent = target.toUpperCase() + ' - DEPLOYING';
+        document.getElementById('target-threat').textContent = 'GENERATING MATERIALS...';
+        document.getElementById('target-status').textContent = 'STRIKE IN PROGRESS';
+
+        if (panelProfiles[target]) {
+            renderEngageResult({ profile: panelProfiles[target] }, target);
+        }
+
+        const response = await buildEngageRequest(target);
+        const data = await response.json();
+        renderEngageResult(data, target);
+        document.getElementById('target-lock-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleImageError(img) {
+        const target = document.getElementById('target-input').value.trim();
+        if (target) {
+            img.src = `/logos/${target.toLowerCase().replace(/ /g, '_')}.png?fallback=1`;
+            img.onerror = () => {
+                img.classList.add('hidden');
+                document.getElementById('target-lock-placeholder').classList.remove('hidden');
+            };
+            return;
+        }
+        img.classList.add('hidden');
+        document.getElementById('target-lock-placeholder').classList.remove('hidden');
+    }
+
+    function setTargetImage(url) {
+        const img = document.getElementById('target-lock-img');
+        const placeholder = document.getElementById('target-lock-placeholder');
+        if (!url) {
+            img.classList.add('hidden');
+            placeholder.classList.remove('hidden');
+            return;
+        }
+        img.onload = () => {
+            img.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+        };
+        img.onerror = () => handleImageError(img);
+        img.src = url;
+    }
+
+    document.querySelectorAll('.escalation-node').forEach(node => {
+        node.addEventListener('click', () => showEscalationLevel(node.dataset.level));
+    });
+
+    function showEscalationLevel(level) {
+        const text = escalationData['level_' + level];
+        if (!text) return;
+
+        document.getElementById('escalation-detail').classList.remove('hidden');
+        document.getElementById('escalation-level-label').textContent = 'Level ' + level;
+        document.getElementById('escalation-level-text').textContent = text;
+
+        document.querySelectorAll('.escalation-node').forEach(node => {
+            const diamond = node.querySelector('.node-diamond');
+            const isActive = node.dataset.level === level;
+            diamond.className = 'node-diamond w-3 h-3 rotate-45 transition-colors duration-300 ' + (
+                isActive
+                    ? (level === '6' ? 'bg-hunter-crimson border-[0.5px] border-hunter-crimson' : 'bg-liquid-silver border-[0.5px] border-liquid-silver')
+                    : (node.dataset.level === '6' ? 'bg-background border-[0.5px] border-hunter-crimson' : 'bg-background border-[0.5px] border-liquid-silver/20')
+            );
+        });
+    }
+
+    function renderDocs(docs, files) {
+        document.getElementById('docs-results').classList.remove('hidden');
+        document.getElementById('doc-subject').textContent = docs.subject_line || '--';
+        document.getElementById('doc-summary').textContent = docs.rewritten_cv_summary || docs.summary || '--';
+
+        const bullets = document.getElementById('doc-bullets');
+        bullets.innerHTML = '';
+        (docs.key_bullets || []).forEach(b => {
+            const li = document.createElement('li');
+            li.textContent = '— ' + b;
+            bullets.appendChild(li);
+        });
+
+        document.getElementById('doc-cover-letter').textContent = docs.cover_letter || '--';
+
+        if (files) {
+            document.getElementById('doc-downloads').classList.remove('hidden');
+            document.getElementById('download-resume').href = files.resume_docx;
+            document.getElementById('download-cover').href = files.cover_letter_docx;
+        }
+    }
+
+    function renderEscalation(escalation) {
+        escalationData = escalation;
+        document.getElementById('escalation-section').classList.remove('hidden');
+        showEscalationLevel('1');
+    }
+
+    function toggleMode() {
+        panelMode = !panelMode;
+        const btn = document.getElementById('mode-toggle');
+        const input = document.getElementById('target-input');
+        btn.textContent = panelMode ? 'PANEL MODE' : 'SINGLE TARGET';
+        btn.classList.toggle('text-hunter-crimson', !panelMode);
+        btn.classList.toggle('text-liquid-silver', panelMode);
+        input.placeholder = panelMode ? 'Hit Enter to acquire all judges' : 'Designate Target...';
+        if (!panelMode) {
+            document.getElementById('panel-acquisition').classList.add('hidden');
+        }
+    }
+
+    async function engage() {
+        if (panelMode) {
+            return engagePanel();
+        }
+
+        const target = document.getElementById('target-input').value;
+        if (!target) return;
+
+        document.getElementById('target-identity').textContent = target.toUpperCase() + ' - ACQUIRING';
+        document.getElementById('target-threat').textContent = 'SCANNING...';
+        document.getElementById('target-status').textContent = 'HUNTING...';
+
+        const response = await buildEngageRequest(target);
+        const data = await response.json();
+        renderEngageResult(data, target);
+    }
+</script>
+</body></html>
