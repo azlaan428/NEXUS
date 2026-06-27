@@ -8,6 +8,7 @@ from rimac.concept_one import heartbeat, register
 from ferrari.sf90 import watch as sf90_watch
 from koenigsegg.agera_rs import process_pending as agera_process
 from koenigsegg.ccxr import deduplicate
+from koenigsegg.jesko import route as jesko_route
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +48,11 @@ def boot():
             "fn": sf90_watch,
             "minutes": 60,
             "name": "ferrari_sf90"
+        }
+        {
+            "fn": jesko_route,
+            "minutes": 63,
+            "name": "koenigsegg_jesko"
         }
     ]
 
