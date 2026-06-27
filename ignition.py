@@ -7,6 +7,7 @@ from rimac.nevera import start as nevera_start, stop as nevera_stop
 from rimac.concept_one import heartbeat, register
 from ferrari.sf90 import watch as sf90_watch
 from koenigsegg.agera_rs import process_pending as agera_process
+from koenigsegg.ccxr import deduplicate
 
 logging.basicConfig(
     level=logging.INFO,
@@ -27,12 +28,16 @@ def boot():
     register("heartbeat", heartbeat)
 
     jobs = [
-        # in jobs list:
         {
             "fn": agera_process,
             "minutes": 61,
             "name": "koenigsegg_agera_rs"
-        }
+        },
+        {
+            "fn": deduplicate,
+            "minutes": 62,
+            "name":"koenigsegg_ccxr"
+        },
         {
             "fn": heartbeat,
             "minutes": 10,
