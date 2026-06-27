@@ -1,11 +1,11 @@
 # ignition.py — turns the key, everything starts
 
 import logging
-import os
 from flask import Flask
 from pit_lane.fuel import init as fuel_up
 from rimac.nevera import start as nevera_start, stop as nevera_stop
 from rimac.concept_one import heartbeat, register
+from ferrari.sf90 import watch as sf90_watch
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,18 +21,20 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 def boot():
     log.info("NEXUS: ignition sequence started")
 
-    # fuel the pit lane
     fuel_up()
 
-    # register heartbeat
     register("heartbeat", heartbeat)
 
-    # define scheduled jobs
     jobs = [
         {
             "fn": heartbeat,
             "minutes": 10,
             "name": "concept_one_heartbeat"
+        },
+        {
+            "fn": sf90_watch,
+            "minutes": 60,
+            "name": "ferrari_sf90"
         }
     ]
 
