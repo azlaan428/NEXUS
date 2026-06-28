@@ -4,7 +4,7 @@ import sqlite3
 import os
 import json
 import logging
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, jsonify, current_app, send_from_directory
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,7 +44,7 @@ def _profile_for_owner(c, owner: str) -> dict:
 
 @phantom.route("/")
 def index():
-    return render_template("index.html")
+    return send_from_directory(current_app.static_folder, "index.html")
 
 
 @phantom.route("/api/queue")
